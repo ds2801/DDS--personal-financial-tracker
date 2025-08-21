@@ -1,0 +1,80 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+using namespace std;
+
+struct Transaction {
+    char type[10];   // Income / Expense
+    char desc[50];
+    float amount;
+};
+
+Transaction t[100];
+int n = 0;
+
+void addTransaction() {
+    cout << "Enter type (Income/Expense): ";
+    cin >> t[n].type;
+    cout << "Enter description: ";
+    cin.ignore();
+    cin.getline(t[n].desc, 50);
+    cout << "Enter amount: ";
+    cin >> t[n].amount;
+    n++;
+}
+
+void displayAll() {
+    cout << "\n--- All Transactions ---\n";
+    for (int i = 0; i < n; i++) {
+        cout << i+1 << ". " << t[i].type << " | "
+             << t[i].desc << " | " << t[i].amount << "\n";
+    }
+}
+
+void filterExpenses() {
+    cout << "\nExpenses > 100:\n";
+    for (int i = 0; i < n; i++) {
+        if (strcmp(t[i].type, "Expense") == 0 && t[i].amount > 100) {
+            cout << t[i].desc << " - " << t[i].amount << "\n";
+        }
+    }
+}
+
+void saveToFile() {
+    ofstream fout("finance.txt");
+    for (int i = 0; i < n; i++) {
+        fout << t[i].type << "," << t[i].desc << "," << t[i].amount << "\n";
+    }
+    fout.close();
+    cout << "Data saved to finance.txt\n";
+}
+
+void loadFromFile() {
+    ifstream fin("finance.txt");
+    n = 0;
+    while (fin.getline(t[n].type, 10, ',')) {
+        fin.getline(t[n].desc, 50, ',');
+        fin >> t[n].amount;
+        fin.ignore();
+        n++;
+    }
+    fin.close();
+    cout << "Data loaded from finance.txt\n";
+}
+
+int main() {
+    int ch;
+    do {
+        cout << "\n--- Personal Finance Tracker ---\n";
+        cout << "1. Add Transaction\n2. Display All\n3. Filter Expenses >100\n4. Save\n5. Load\n0. Exit\nChoice: ";
+        cin >> ch;
+        switch(ch) {
+            case 1: addTransaction(); break;
+            case 2: displayAll(); break;
+            case 3: filterExpenses(); break;
+            case 4: saveToFile(); break;
+            case 5: loadFromFile(); break;
+        }
+    } while(ch != 0);
+    return 0;
+}
